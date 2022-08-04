@@ -15,6 +15,7 @@ namespace Data.Repositories
             _db = db;
         }
 
+        // return id here
         public async Task AddAsync(Book book)
         {
             await _db.AddAsync(book);
