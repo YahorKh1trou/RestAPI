@@ -13,7 +13,8 @@ namespace RestAPI.Models
             Bookname = domainBook.Bookname;
             Year = domainBook.Year;
         }
-        public int Id { get; set; }
+        // Use Guid for ids
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
         public string Patro { get; set; }

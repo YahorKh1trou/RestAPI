@@ -2,6 +2,7 @@
 
 namespace Services.Services.Contracts
 {
+    // add methods that can accept Expressions to make methods of repository useful
     public interface IBooksService
     {
         Task<IEnumerable<Book>> GetAsync();

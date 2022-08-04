@@ -29,6 +29,7 @@ namespace RestAPI.ViewModels
                 Name = updateBook.Name,
                 Lastname = updateBook.Lastname,
                 Patro = updateBook.Patro,
+                // more safety to use TryParse method
                 Birthdate = DateTime.Parse(updateBook.Birthdate),
                 Bookname = updateBook.Bookname,
                 Year = updateBook.Year,

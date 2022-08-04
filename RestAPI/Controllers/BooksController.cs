@@ -7,6 +7,7 @@ using Services.Services.Contracts;
 
 namespace RestAPI.Controllers
 {
+    // add auth attribute to endpoints
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -21,6 +22,7 @@ namespace RestAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> Get()
         {
+            // why do not use expression while execute sql request, not good idea to filter in RAM
             var domainBooks = await _booksService.GetAsync();
             return Ok(domainBooks.Select(x => new Book(x) { Birthdate = x.Birthdate.ToString("dd.MM.yyyy") }));
         }
@@ -47,6 +49,7 @@ namespace RestAPI.Controllers
             book.Counter = Counter.Increment();
 
             await _booksService.AddBookAsync(book.ToDomainBook(book));
+            // remove this, return id from repository (service)
             var domainBooks = await _booksService.GetAsync();
             book.Id = domainBooks.Max(p => p.Id);
 
@@ -68,15 +71,18 @@ namespace RestAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            // I think you can encapsulate it in service method (smth like DeleteById)
             var book = await _booksService.GetByIdAsync(id);
             if (book == null)
             {
                 return NotFound();
             }
+            
             await _booksService.DeleteBookAsync(book);
             return Ok(book);
         }
 
+        // move to another controller
         [Authorize]
         [Route("getlogin")]
         public IActionResult GetLogin()
@@ -84,10 +90,12 @@ namespace RestAPI.Controllers
             return Ok($"Ваш логин: {User.Identity.Name}");
         }
 
+        // move to another controller
         [Authorize(Roles = "admin")]
         [Route("getrole")]
         public IActionResult GetRole()
         {
+            // hardcoded:)
             return Ok("Ваша роль: администратор");
         }
 
