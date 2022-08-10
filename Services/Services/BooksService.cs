@@ -1,5 +1,6 @@
 ﻿using Data.Data.Models;
 using Data.Repositories.Contracts;
+using Services.CustomExceptions;
 using Services.Services.Contracts;
 
 namespace Services.Services
@@ -13,7 +14,7 @@ namespace Services.Services
             _booksRepository = booksRepository;
         }
 
-        public async Task<Book> GetByIdAsync(int id)
+        public async Task<Book> GetByIdAsync(Guid id)
         {
             return await _booksRepository.GetAsync(id);
         }
@@ -25,7 +26,7 @@ namespace Services.Services
 
         public async Task<Book> AddBookAsync(Book book)
         {
-            await _booksRepository.AddAsync(book);
+            book.Id = await _booksRepository.AddAsync(book);
             return book;
         }
 
@@ -35,9 +36,15 @@ namespace Services.Services
             return book;
         }
 
-        public async Task DeleteBookAsync(Book book)
+        public async Task<Book> DeleteBookAsync(Guid id)
         {
-            await _booksRepository.RemoveAsync(book.Id);
+            var book = await GetByIdAsync(id);
+            if (book == null)
+            {
+                throw new BookNotFoundException($"Book with {id} not found");
+            }
+            await _booksRepository.RemoveAsync(id);
+            return book;
         }
     }
 }

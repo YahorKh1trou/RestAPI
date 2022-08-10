@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using RestAPI.Counters;
 using RestAPI.Models;
 using RestAPI.ViewModels;
+using Services.CustomExceptions;
 using Services.Services.Contracts;
 
 namespace RestAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -18,37 +20,38 @@ namespace RestAPI.Controllers
             _booksService = booksService;
         }
 
+//        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> Get()
         {
             var domainBooks = await _booksService.GetAsync();
-            return Ok(domainBooks.Select(x => new Book(x) { Birthdate = x.Birthdate.ToString("dd.MM.yyyy") }));
+            return Ok(domainBooks.Select(x => new Book(x)));
         }
 
-        // GET api/books/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> Get(int id)
+        public async Task<ActionResult<Book>> Get(Guid id)
         {
             var book = await _booksService.GetByIdAsync(id);
             if (book == null)
                 return NotFound();
-            return Ok(new Book(book) { Birthdate = book.Birthdate.ToString("dd.MM.yyyy") });
+            return Ok(new Book(book));
         }
         // POST api/books
         [HttpPost]
-        public async Task<ActionResult<Book>> Post(AddBookViewModel book)
+        public async Task<ActionResult<Book>> Post(AddBookViewModel addBook)
         {
-            if (book == null || !book.Validate())
+            if (addBook == null || !addBook.Validate())
             {
                 return BadRequest();
             }
 
+            var newBook = await _booksService.AddBookAsync(addBook.ToDomainBook(addBook));
+            //            var domainBooks = await _booksService.GetAsync();
+            //            book.Id = domainBooks.Max(p => p.Id);
+            var book = new Book(newBook);
+
             AddCounter Counter = AddCounter.Initialize();
             book.Counter = Counter.Increment();
-
-            await _booksService.AddBookAsync(book.ToDomainBook(book));
-            var domainBooks = await _booksService.GetAsync();
-            book.Id = domainBooks.Max(p => p.Id);
 
             return Ok(book);
         }
@@ -56,7 +59,7 @@ namespace RestAPI.Controllers
         [HttpPut]
         public async Task<ActionResult<Book>> Put(UpdateBookViewModel book)
         {
-            if (book == null)
+            if (book == null || !book.Validate())
             {
                 return BadRequest();
             }
@@ -65,18 +68,25 @@ namespace RestAPI.Controllers
         }
 
         // DELETE api/books/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var book = await _booksService.GetByIdAsync(id);
-            if (book == null)
+            try
             {
-                return NotFound();
+                var book = await _booksService.DeleteBookAsync(id);
+                return Ok(book);
             }
-            await _booksService.DeleteBookAsync(book);
-            return Ok(book);
+            catch(Exception ex)
+            {
+                if(ex is BookNotFoundException bookException)
+                {
+                    return NotFound(bookException.Message);
+                }
+                return StatusCode(500);
+            }
         }
-
+/*
         [Authorize]
         [Route("getlogin")]
         public IActionResult GetLogin()
@@ -90,6 +100,6 @@ namespace RestAPI.Controllers
         {
             return Ok("Ваша роль: администратор");
         }
-
+*/
     }
 }

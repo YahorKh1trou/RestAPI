@@ -5,12 +5,12 @@ namespace Data.Repositories.Contracts
 {
     public interface IRepository<T> where T : class
     {
-        Task<T> GetAsync(int id);
+        Task<T> GetAsync(Guid id);
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
         Task<T> GetAsync(Expression<Func<T, bool>> predicate);
         Task<T> GetLastAsync(Expression<Func<T, bool>> predicate);
-        Task AddAsync(T book);
+        Task<Guid> AddAsync(T book);
         Task UpdateAsync(T book);
-        Task RemoveAsync(int id);
+        Task RemoveAsync(Guid id);
     }
 }

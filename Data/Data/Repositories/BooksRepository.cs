@@ -15,16 +15,17 @@ namespace Data.Repositories
             _db = db;
         }
 
-        public async Task AddAsync(Book book)
+        public async Task<Guid> AddAsync(Book book)
         {
             await _db.AddAsync(book);
             await _db.SaveChangesAsync();
+            return book.Id;
         }
 
         public async Task<List<Book>> GetAllAsync(Expression<Func<Book, bool>> predicate)
             => await _db.Books.Where(predicate).ToListAsync();
 
-        public async Task<Book> GetAsync(int id)
+        public async Task<Book> GetAsync(Guid id)
             => await _db.Books.SingleOrDefaultAsync(x => x.Id == id);
 
         public async Task<Book> GetAsync(Expression<Func<Book, bool>> predicate)
@@ -33,7 +34,7 @@ namespace Data.Repositories
         public async Task<Book> GetLastAsync(Expression<Func<Book, bool>> predicate)
             => (await GetAllAsync(predicate)).LastOrDefault();
 
-        public async Task RemoveAsync(int id)
+        public async Task RemoveAsync(Guid id)
         {
             var book = await GetAsync(id);
             _db.Remove(book);

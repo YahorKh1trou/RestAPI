@@ -4,7 +4,7 @@ namespace RestAPI.ViewModels
 {
     public class UpdateBookViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Lastname { get; set; }
         public string Patro { get; set; }
@@ -12,9 +12,15 @@ namespace RestAPI.ViewModels
         public string Bookname { get; set; }
         public int? Year { get; set; }
 
+        public DateTime ConvertedDate;
+
         public bool Validate()
         {
             if (string.IsNullOrWhiteSpace(Name))
+            {
+                return false;
+            }
+            if (!DateTime.TryParse(Birthdate, out ConvertedDate))
             {
                 return false;
             }
@@ -29,7 +35,7 @@ namespace RestAPI.ViewModels
                 Name = updateBook.Name,
                 Lastname = updateBook.Lastname,
                 Patro = updateBook.Patro,
-                Birthdate = DateTime.Parse(updateBook.Birthdate),
+                Birthdate = ConvertedDate,
                 Bookname = updateBook.Bookname,
                 Year = updateBook.Year,
             };

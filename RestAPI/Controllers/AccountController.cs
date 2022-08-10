@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Data.Data.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using RestAPI.Constants;
 using RestAPI.Models;
+using RestAPI.ViewModels;
 using Services.Services;
+using Services.Services.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -10,15 +14,16 @@ namespace RestAPI.Controllers
 {
     public class AccountController : Controller
     {
-        private List<Person> people = new List<Person>
+        private readonly IPeopleService _peopleService;
+        public AccountController(IPeopleService peopleService)
         {
-            new Person { Login = ApiConstants.Login, Password = ApiConstants.Password, Role = ApiConstants.Role }
-        };
+            _peopleService = peopleService;
+        }
 
         [HttpPost("/token")]
-        public IActionResult Token(string username, string password)
+        public async Task<IActionResult> Token(string username, string password)
         {
-            var identity = GetIdentity(username, password);
+            var identity = await GetIdentityAsync(username, password);
             if (identity == null)
             {
                 return BadRequest(new { errorText = ApiConstants.AuthError });
@@ -44,9 +49,10 @@ namespace RestAPI.Controllers
             return Json(response);
         }
 
-        private ClaimsIdentity GetIdentity(string username, string password)
+        private async Task<ClaimsIdentity> GetIdentityAsync(string username, string password)
         {
-            Person person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
+            var person = await _peopleService.GetByIdAsync(username, password);
+//            Person person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
             if (person != null)
             {
                 var claims = new List<Claim>

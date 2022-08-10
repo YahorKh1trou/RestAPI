@@ -8,6 +8,9 @@ builder.Services.AddServices();
 builder.Services.AddControllers();
 builder.Services.AddAuth();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -16,6 +19,12 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseEndpoints(endpoints =>
 {

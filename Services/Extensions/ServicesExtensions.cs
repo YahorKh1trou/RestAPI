@@ -9,7 +9,8 @@ namespace Services.Extensions
     public static class ServicesExtensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
-            => services.AddScoped<IBooksService, BooksService>();
+            => services.AddScoped<IBooksService, BooksService>()
+               .AddScoped<IPeopleService, PeopleService>();
 
         public static void AddAuth(this IServiceCollection services)
             => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
