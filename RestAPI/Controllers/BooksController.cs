@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.Counters;
 using RestAPI.Models;
 using RestAPI.ViewModels;
 using Services.CustomExceptions;
 using Services.Services.Contracts;
+using System.Security.Claims;
 
 namespace RestAPI.Controllers
 {
@@ -20,7 +22,6 @@ namespace RestAPI.Controllers
             _booksService = booksService;
         }
 
-//        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> Get()
         {
@@ -28,14 +29,34 @@ namespace RestAPI.Controllers
             return Ok(domainBooks.Select(x => new Book(x)));
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> Get(Guid id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Book>> Get(int id)
         {
             var book = await _booksService.GetByIdAsync(id);
             if (book == null)
                 return NotFound();
             return Ok(new Book(book));
         }
+
+        //        [HttpGet("get/{name}")]
+        [HttpGet("get/{bookname}")]
+//        [HttpGet("{bookname:alpha}")]
+        public async Task<ActionResult<IEnumerable<Book>>> Get(string bookname)
+        {
+            var domainBooks = await _booksService.GetByNameAsync(bookname);
+            return Ok(domainBooks.Select(x => new Book(x)));
+        }
+
+//        [Authorize(Policy = "admin")]
+        [HttpGet("{lastname:alpha}")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetAuthor(string lastname)
+        {
+//            var userRole = HttpContext.User.FindFirst("client_Role").ToString();
+            var domainBooks = await _booksService.GetByAuthorAsync(lastname);
+            return Ok(domainBooks.Select(x => new Book(x)));
+        }
+
+        [Authorize(Policy = "admin")]
         // POST api/books
         [HttpPost]
         public async Task<ActionResult<Book>> Post(AddBookViewModel addBook)
@@ -53,6 +74,8 @@ namespace RestAPI.Controllers
             AddCounter Counter = AddCounter.Initialize();
             book.Counter = Counter.Increment();
 
+//            book.Price = 30;
+
             return Ok(book);
         }
         // PUT api/books/
@@ -68,9 +91,9 @@ namespace RestAPI.Controllers
         }
 
         // DELETE api/books/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Policy = "admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -86,20 +109,5 @@ namespace RestAPI.Controllers
                 return StatusCode(500);
             }
         }
-/*
-        [Authorize]
-        [Route("getlogin")]
-        public IActionResult GetLogin()
-        {
-            return Ok($"Ваш логин: {User.Identity.Name}");
-        }
-
-        [Authorize(Roles = "admin")]
-        [Route("getrole")]
-        public IActionResult GetRole()
-        {
-            return Ok("Ваша роль: администратор");
-        }
-*/
     }
 }

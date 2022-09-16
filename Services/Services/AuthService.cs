@@ -5,6 +5,7 @@ namespace Services.Services
 {
     public class AuthService
     {
+/*
         public const string ISSUER = "MyAuthServer";
         public const string AUDIENCE = "MyAuthClient";
         const string KEY = "mysupersecret_secretkey!123";
@@ -13,5 +14,6 @@ namespace Services.Services
         {
             return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(KEY));
         }
+*/
     }
 }

@@ -36,14 +36,14 @@ namespace RestAPI.Controllers
             return Ok(newPerson);
         }
 
-        [Authorize]
+//        [Authorize]
         [Route("getlogin")]
         public IActionResult GetLogin()
         {
             return Ok($"Ваш логин: {User.Identity.Name}");
         }
 
-        [Authorize]
+//        [Authorize]
         [Route("getrole")]
         public IActionResult GetRole()
         {

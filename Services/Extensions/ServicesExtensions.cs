@@ -10,8 +10,10 @@ namespace Services.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
             => services.AddScoped<IBooksService, BooksService>()
-               .AddScoped<IPeopleService, PeopleService>();
-
+               .AddScoped<IPeopleService, PeopleService>()
+               .AddScoped<IOrderItemService, OrderItemService>()
+               .AddScoped<IOrderService, OrderService>();
+/*
         public static void AddAuth(this IServiceCollection services)
             => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                    .AddJwtBearer(options =>
@@ -28,6 +30,8 @@ namespace Services.Extensions
                              ValidateIssuerSigningKey = true,
                          };
                    });
-
+*/
+//        public static void AddAuth(this IServiceCollection services)
+//            => services.AddIdentityServer().AddDeveloperSigningCredential().AddInMemoryApiScopes(Configur.ApiScopes)
     }
 }

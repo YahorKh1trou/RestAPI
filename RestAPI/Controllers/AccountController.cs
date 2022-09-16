@@ -14,6 +14,7 @@ namespace RestAPI.Controllers
 {
     public class AccountController : Controller
     {
+/*
         private readonly IPeopleService _peopleService;
         public AccountController(IPeopleService peopleService)
         {
@@ -69,5 +70,6 @@ namespace RestAPI.Controllers
             // если пользователя не найдено
             return null;
         }
+*/
     }
 }

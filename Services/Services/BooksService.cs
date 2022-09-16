@@ -14,9 +14,19 @@ namespace Services.Services
             _booksRepository = booksRepository;
         }
 
-        public async Task<Book> GetByIdAsync(Guid id)
+        public async Task<Book> GetByIdAsync(int id)
         {
             return await _booksRepository.GetAsync(id);
+        }
+
+        public async Task<IEnumerable<Book>> GetByNameAsync(string bookname)
+        {
+            return await _booksRepository.GetByNameAsync(bookname);
+        }
+
+        public async Task<IEnumerable<Book>> GetByAuthorAsync(string lastname)
+        {
+            return await _booksRepository.GetByAuthorAsync(lastname);
         }
 
         public async Task<IEnumerable<Book>> GetAsync()
@@ -36,7 +46,7 @@ namespace Services.Services
             return book;
         }
 
-        public async Task<Book> DeleteBookAsync(Guid id)
+        public async Task<Book> DeleteBookAsync(int id)
         {
             var book = await GetByIdAsync(id);
             if (book == null)
@@ -45,6 +55,15 @@ namespace Services.Services
             }
             await _booksRepository.RemoveAsync(id);
             return book;
+        }
+
+        public async Task<IEnumerable<Book>> GetAllByIdAsync(IEnumerable<int> bookIds)
+        {
+            var allBooks = await GetAsync();
+            var foundBooks = from book in allBooks
+                             join bookId in bookIds on book.Id equals bookId
+                             select book;
+            return (List<Book>)foundBooks;
         }
     }
 }

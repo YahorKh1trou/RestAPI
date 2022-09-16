@@ -10,6 +10,7 @@ namespace RestAPI.ViewModels
         public string Birthdate { get; set; }
         public string Bookname { get; set; }
         public int? Year { get; set; }
+        public int Price { get; set; }
 
         public DateTime ConvertedDate;
 
@@ -36,6 +37,7 @@ namespace RestAPI.ViewModels
                 Birthdate = ConvertedDate,
                 Bookname = addBook.Bookname,
                 Year = addBook.Year,
+                Price = addBook.Price,
             };
         }
     }

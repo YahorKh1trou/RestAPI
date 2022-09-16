@@ -7,7 +7,6 @@ namespace Services.Services.Contracts
         Task<IEnumerable<Person>> GetAsync();
         Task<Person> GetOneAsync();
         Task<Person> GetByIdAsync(string username, string password);
-
         Task<Person> AddPersonAsync(Person person);
     }
 }
